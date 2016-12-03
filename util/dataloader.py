@@ -2,14 +2,26 @@ import pandas as pd
 import numpy as np
 import os
 import sys
+import csv
 
 def test():
     print "It works!"
     pass
 
-# load the rating data
+# load the rating data from csv file
+# return rating data in pandas data frame
+def get_rating_table_from_csv(csv_file_path):
+    if csv_file_path.endswith('.csv') and os.path.exists(csv_file_path):
+        data = pd.read_csv(csv_file_path, header=0,
+            dtype={'userId':str, 'itemId':str, 'rating':np.float64, 'timestamp':np.int64})
+        return data
+    else:
+        sys.stderr("Data file either not exists or cannot be loaded!")
+        return None
+
+# load the rating data from csv file
 # return rating data embedded in Ratings instance
-def get_rating_data(csv_file_path):
+def get_rating_matrix_from_csv(csv_file_path):
     if csv_file_path.endswith('.csv') and os.path.exists(csv_file_path):
         data = pd.read_csv(csv_file_path, header=0,
             dtype={'userId':str, 'itemId':str, 'rating':np.float64, 'timestamp':np.int64})

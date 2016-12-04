@@ -26,9 +26,19 @@ trainset_target = trainset['rating'].values
 testset_feature = testset[['userId','itemId', 'timestamp']].values
 testset_target = testset['rating'].values
 
-unn = unnx.UserNearestNeighbor(topk=10, sim_method='Pearson')
+unn = unnx.UserNearestNeighbor(topk=30, sim_method='Pearson')
 unn.fit(trainset_feature, trainset_target)
 # kf = KFold(n_splits=5)
+# scores = list()
+# for train_index, valid_index in kf.split(trainset_feature):
+#     print("New validation start...")
+#     X_train, X_valid = trainset_feature[train_index], trainset_feature[train_index]
+#     y_train, y_valid = trainset_target[train_index], trainset_target[train_index]
+#     unn.fit(X_train, y_train)
+#     scores.append(unn.score(X_valid, y_valid))
 # print scores
+# print np.mean(scores), np.std(scores)
+predictions = unn.predict(testset_feature)
+print zip(predictions, testset_target)
 rmse = unn.score(testset_feature, testset_target)
 print rmse

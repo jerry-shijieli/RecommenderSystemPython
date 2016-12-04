@@ -11,7 +11,7 @@ class UserNearestNeighbor:
         self.topk = topk # max number of nearest neighbors used for prediction
         self.sim_method = sim_method # method name of similarity calculation
         self.user_sim_matrix = None # matrix of user-user similarity
-        self.ratings = None # rating instance of Rating
+        self.ratings = None # rating instance of Ratings
 
     # training process: build user-user similarity matrix
     def fit(self, trainset_feature, trainset_target):

@@ -21,7 +21,7 @@ class MultiNeuralNetwork:
         original_rating_matrix = np.matrix(self.ratings.rating_matrix)
         #self.complete_rating_matrix = np.matrix(self.ratings.rating_matrix)
         self.models = [None for _ in range(self.ratings.num_of_items)]
-        pass
+
         for itemIndex in xrange(self.ratings.num_of_items):
             mlpr = MLPRegressor(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(3,), random_state=1, activation='relu', max_iter=50)
             qualified_training_feature = list()

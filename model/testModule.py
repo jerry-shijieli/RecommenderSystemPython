@@ -4,7 +4,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 sys.path.append("../util/")
 import dataloader as dl
-import UserNearestNeighbor as unnx
+import UserNearestNeighbor as unn_model
+import MultiNeuralNetwork as mnn_model
 
 
 dl.test()
@@ -26,19 +27,26 @@ trainset_target = trainset['rating'].values
 testset_feature = testset[['userId','itemId', 'timestamp']].values
 testset_target = testset['rating'].values
 
-unn = unnx.UserNearestNeighbor(topk=30, sim_method='Pearson')
-unn.fit(trainset_feature, trainset_target)
-# kf = KFold(n_splits=5)
-# scores = list()
-# for train_index, valid_index in kf.split(trainset_feature):
-#     print("New validation start...")
-#     X_train, X_valid = trainset_feature[train_index], trainset_feature[train_index]
-#     y_train, y_valid = trainset_target[train_index], trainset_target[train_index]
-#     unn.fit(X_train, y_train)
-#     scores.append(unn.score(X_valid, y_valid))
-# print scores
-# print np.mean(scores), np.std(scores)
-predictions = unn.predict(testset_feature)
+# unn = unn_model.UserNearestNeighbor(topk=30, sim_method='Pearson')
+# unn.fit(trainset_feature, trainset_target)
+# # kf = KFold(n_splits=5)
+# # scores = list()
+# # for train_index, valid_index in kf.split(trainset_feature):
+# #     print("New validation start...")
+# #     X_train, X_valid = trainset_feature[train_index], trainset_feature[train_index]
+# #     y_train, y_valid = trainset_target[train_index], trainset_target[train_index]
+# #     unn.fit(X_train, y_train)
+# #     scores.append(unn.score(X_valid, y_valid))
+# # print scores
+# # print np.mean(scores), np.std(scores)
+# predictions = unn.predict(testset_feature)
+# print zip(predictions, testset_target)
+# rmse = unn.score(testset_feature, testset_target)
+# print rmse
+
+mnn = mnn_model.MultiNeuralNetwork(threshold_rating_num=2000) # set the least number of rated values
+mnn.fit(trainset_feature, trainset_target)
+predictions = mnn.predict(testset_feature)
 print zip(predictions, testset_target)
-rmse = unn.score(testset_feature, testset_target)
+rmse = mnn.score(testset_feature, testset_target)
 print rmse

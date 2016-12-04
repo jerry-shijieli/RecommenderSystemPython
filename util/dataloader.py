@@ -38,6 +38,8 @@ class Ratings:
         self.ratings = rating_data # data frame containing (userId, itemId, rating, timestamp)
         self.users_indices = None  # dictionary of {userId: userIndex}
         self.items_indices = None  # dictionary of {itemId: itemIndex}
+        self.user_ids = None    # dictionary of {userIndex: userId}
+        self.item_ids = None    # dictionary of {itemIndex: itemId}
         self.num_of_users = 0   # number of total users
         self.num_of_items = 0   # number of total items
         self.rating_matrix = None   # matrix of user-item rating by user and item indices
@@ -55,10 +57,14 @@ class Ratings:
         items.sort()
         self.users_indices = dict()
         self.items_indices = dict()
+        self.user_ids = dict()
+        self.item_ids = dict()
         for index, userId in enumerate(users):
             self.users_indices[userId] = index
+            self.user_ids[index] = userId
         for index, itemId in enumerate(items):
             self.items_indices[itemId] = index
+            self.item_ids[index] = itemId
         self.num_of_users = len(self.users_indices)
         self.num_of_items = len(self.items_indices)
         rating_values = [[self.missing_rating_default_value for _ in range(self.num_of_items)]

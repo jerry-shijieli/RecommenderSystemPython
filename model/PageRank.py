@@ -63,7 +63,7 @@ class PageRank:
     def get_ranks(self):
         return self.ranks
 
-# helper function to save the ranking result
+# helper function to save the ranking result into ../result folder
 def save_results(ranks, filename):
     save_path = os.path.join('../result', filename)
     with open(save_path, 'wb') as fout:

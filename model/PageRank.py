@@ -96,8 +96,20 @@ class PageRank:
             ranks.append(rk*node_size_scale)
             node_labels[nd] = nd
         sg.add_star(nodes=nodes, weights=ranks)
+        plt.figure(1)
         pos = nx.spring_layout(sg) # set position of nodes
         nx.draw(sg, pos, labels=node_labels, node_color=ranks, node_size=ranks, cmap=plt.cm.Blues)
+        plt.savefig('../result/star_graph.png')
+        plt.show()
+
+    # draw the whole
+    def draw_graph(self):
+        plt.figure(0)
+        #pos = nx.spring_layout(self.graph, iterations=200)
+        nx.draw(self.graph, node_color='red', node_size=10, width=1.0)
+        #nx.draw_networkx_nodes(self.graph, node_color='red', node_size=100)
+        #nx.draw_networkx_edges(self.graph,  width=1.0)
+        plt.savefig('../result/all_user_graph.png')
         plt.show()
 
 
@@ -125,6 +137,7 @@ def main():
     save_filename = data_filename.split('/')[-1].split('.')[0] + ".csv"
     save_results(sorted_ranks, save_filename)
     pagerank.draw_top_neighbor_graph('12', 50)
+    pagerank.draw_graph()
 
 
 if __name__ == "__main__":

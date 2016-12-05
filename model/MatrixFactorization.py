@@ -87,6 +87,7 @@ class MatrixFactorization:
 
 # main function to test module
 def main():
+    #datafilepath = '../data/amazon_review/ratings_x.csv'
     datafilepath = '../data/ml-latest-small/ratings_x.csv'
     dataset = dl.get_rating_table_from_csv(datafilepath)
 
@@ -100,7 +101,7 @@ def main():
     testset_feature = testset[['userId', 'itemId', 'timestamp']].values
     testset_target = testset['rating'].values
 
-    mf = MatrixFactorization(dim_of_factor=20, max_iter=100)
+    mf = MatrixFactorization(dim_of_factor=10, max_iter=30)
     mf.fit(trainset_feature, trainset_target)
     predictions = mf.predict(testset_feature)
     print "Prediction vs Actual Value"

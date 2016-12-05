@@ -18,12 +18,12 @@ def read_network_data(datafilename, isDirected):
     if isDirected:
         dg = nx.DiGraph()
         for entry in data:
-            dg.add_edge(entry[0], entry[1])
+            dg.add_edge(str(entry[0]), entry[1])
         return dg
     else:
         udg = nx.Graph()
         for entry in data:
-            udg.add_edge(entry[0], entry[1])
+            udg.add_edge(str(entry[0]), entry[1])
         rank = 1/float(udg.order())
         nx.set_node_attributes(udg, 'rank', rank)
         return udg

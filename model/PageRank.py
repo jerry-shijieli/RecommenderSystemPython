@@ -10,6 +10,8 @@ import csv
 import operator
 import numpy as np
 from networkx.exception import NetworkXError
+import matplotlib.pyplot as plt
+import networkx as nx
 sys.path.append("../util/")
 import dataloader as dl
 
@@ -63,6 +65,42 @@ class PageRank:
     def get_ranks(self):
         return self.ranks
 
+    # check if the node is in the graph
+    def check_node(self, nodeId):
+        return (nodeId in self.graph.nodes())
+
+    # get the top-k ranked neighbor given a node
+    def get_top_influential_neighbors(self, nodeId, topk=10):
+        if self.check_node(nodeId) == False:
+            print "Cannot find the node in the graph!"
+            return None
+        neighbors = self.graph.neighbors(nodeId)
+        neighbor_ranks = dict(zip(neighbors, operator.itemgetter(*neighbors)(self.ranks)))
+        neighbor_ranks = sorted(neighbor_ranks.iteritems(),
+                                key=operator.itemgetter(1), reverse=True) # sort neighbors by rank, return list of tuples
+        neighbor_ranks = neighbor_ranks[:topk] # select top ranked neighbors
+        return neighbor_ranks
+
+    # draw a subgraph to present node and its top neighbors
+    def draw_top_neighbor_graph(self, nodeId, topk=10):
+        neighbor_rank_list = self.get_top_influential_neighbors(nodeId, topk)
+        if neighbor_rank_list is None:
+            print "No neighbor found!"
+        sg = nx.Graph()
+        node_size_scale = 1000 / self.ranks[nodeId]
+        nodes = [nodeId]
+        ranks = [self.ranks[nodeId]*node_size_scale]
+        node_labels = {nodeId: nodeId}
+        for nd, rk in neighbor_rank_list:
+            nodes.append(nd)
+            ranks.append(rk*node_size_scale)
+            node_labels[nd] = nd
+        sg.add_star(nodes=nodes, weights=ranks)
+        pos = nx.spring_layout(sg) # set position of nodes
+        nx.draw(sg, pos, labels=node_labels, node_color=ranks, node_size=ranks, cmap=plt.cm.Blues)
+        plt.show()
+
+
 # helper function to save the ranking result into ../result folder
 def save_results(ranks, filename):
     save_path = os.path.join('../result', filename)
@@ -86,6 +124,8 @@ def main():
     sorted_ranks = sorted(ranks_of_page.iteritems(), key=operator.itemgetter(1), reverse=True)
     save_filename = data_filename.split('/')[-1].split('.')[0] + ".csv"
     save_results(sorted_ranks, save_filename)
+    pagerank.draw_top_neighbor_graph('12', 50)
+
 
 if __name__ == "__main__":
     main()

@@ -5,6 +5,7 @@ sys.path.append("../util/")
 import dataloader as dl
 import similarity as sm
 from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
 
 class UserNearestNeighbor:
     def __init__(self, topk=0, sim_method='Cosine'):
@@ -71,3 +72,31 @@ class UserNearestNeighbor:
     def score(self, testset_feature, testset_target):
         predictions = self.predict(testset_feature)
         return np.sqrt(mean_squared_error(testset_target, predictions))
+
+
+# main function to test module
+def main():
+    datafilepath = '../data/ml-latest-small/ratings_x.csv'
+    dataset = dl.get_rating_table_from_csv(datafilepath)
+
+    trainset, testset = train_test_split(dataset, test_size=0.1, random_state=0)
+    print "training and test size:"
+    print trainset.size, testset.size
+
+    trainset_feature = trainset[['userId', 'itemId', 'timestamp']].values
+    trainset_target = trainset['rating'].values
+
+    testset_feature = testset[['userId', 'itemId', 'timestamp']].values
+    testset_target = testset['rating'].values
+
+    unn = UserNearestNeighbor(topk=30, sim_method='Pearson')
+    unn.fit(trainset_feature, trainset_target)
+    predictions = unn.predict(testset_feature)
+    print "Prediction vs Actual Value"
+    print zip(predictions, testset_target)
+    rmse = unn.score(testset_feature, testset_target)
+    print "RMSE:"
+    print rmse
+
+if __name__ == "__main__":
+    main()

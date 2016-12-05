@@ -52,7 +52,7 @@ testset_target = testset['rating'].values
 # rmse = mnn.score(testset_feature, testset_target)
 # print rmse
 
-mf = mf_model.MatrixFactorization(dim_of_factor=30, max_iter=100)
+mf = mf_model.MatrixFactorization(dim_of_factor=20, max_iter=100)
 mf.fit(trainset_feature, trainset_target)
 predictions = mf.predict(testset_feature)
 print zip(predictions, testset_target)

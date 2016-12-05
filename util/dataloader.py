@@ -2,11 +2,31 @@ import pandas as pd
 import numpy as np
 import os
 import sys
-import csv
+import networkx as nx
 
 def test():
     print "It works!"
     pass
+
+# read social network data for node rank or link prediction
+def read_network_data(datafilename, isDirected):
+    with open(datafilename, 'r') as fin:
+        print "Reading data and building graph ... "
+        data = [x.strip().split('\t') for x in fin.readlines()]
+        data = data[1:] # remove the header
+    fin.close()
+    if isDirected:
+        dg = nx.DiGraph()
+        for entry in data:
+            dg.add_edge(entry[0], entry[1])
+        return dg
+    else:
+        udg = nx.Graph()
+        for entry in data:
+            udg.add_edge(entry[0], entry[1])
+        rank = 1/float(udg.order())
+        nx.set_node_attributes(udg, 'rank', rank)
+        return udg
 
 # load the rating data from csv file
 # return rating data in pandas data frame
@@ -46,8 +66,8 @@ class Ratings:
         self.timestamp_matrix =  None   # matrix of user-item rating timestamp
         self.missing_rating_default_value = missing_rating_default # default value for missing rating
         self._convert_to_matrix()
-        self.max_rating = np.max(ratings_df['rating'])
-        self.min_rating = np.min(ratings_df['rating'])
+        self.max_rating = np.max(self.ratings_df['rating'])
+        self.min_rating = np.min(self.ratings_df['rating'])
 
     # helper function for initialization. Convert the rating data frame to rating and timestamp matrices
     def _convert_to_matrix(self):

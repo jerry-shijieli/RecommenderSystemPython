@@ -6,7 +6,7 @@ import dataloader as dl
 from sklearn.metrics import mean_squared_error
 
 class MatrixFactorization:
-    def __init__(self, dim_of_factor=10, learning_rate=1e-5, regularization=0.015, max_iter=100, tolerance=0.1):
+    def __init__(self, dim_of_factor=10, learning_rate=1e-5, regularization=0.015, max_iter=100, tolerance=1e-5):
         self.dim_of_factor = dim_of_factor # dimension of factor matrix
         self.learning_rate = learning_rate # learning rate in training process
         self.max_iter = max_iter # max number of training iterations
@@ -20,7 +20,7 @@ class MatrixFactorization:
 
     # training process: fit the user factor matrix and item factor matrix using least square optimization
     def fit(self, trainset_feature, trainset_target):
-        self.fit_by_raw_matrix_factorization(self, trainset_feature, trainset_target)
+        self.fit_by_raw_matrix_factorization(trainset_feature, trainset_target)
 
     # apply matrix factorization to the raw rating matrix
     def fit_by_raw_matrix_factorization(self, trainset_feature, trainset_target):
@@ -34,8 +34,8 @@ class MatrixFactorization:
         observe_matrix = (self.ratings.rating_matrix == 0) # initialize and select unrated values to set zero
         count_iter = 0 # iteration counter
         self.complete_rating_matrix = self.user_factor_matrix * self.item_factor_matrix.transpose()
-        self.complete_rating_matrix[self.complete_rating_matrix > max_rating] = max_rating # rescale predicted ratings by top and bottom limits
-        self.complete_rating_matrix[self.complete_rating_matrix < min_rating] = min_rating
+        #self.complete_rating_matrix[self.complete_rating_matrix > max_rating] = max_rating # rescale predicted ratings by top and bottom limits
+        #self.complete_rating_matrix[self.complete_rating_matrix < min_rating] = min_rating
         err_matrix = self.ratings.rating_matrix - self.complete_rating_matrix
         err_matrix[observe_matrix] = 0
         self.loss_val = np.sum(np.power(err_matrix, 2)) \
@@ -50,8 +50,8 @@ class MatrixFactorization:
             self.user_factor_matrix += user_factor_matrix_update
             self.item_factor_matrix += item_factor_matrix_update
             self.complete_rating_matrix = self.user_factor_matrix * self.item_factor_matrix.transpose()
-            self.complete_rating_matrix[self.complete_rating_matrix > max_rating] = max_rating # rescale predicted ratings
-            self.complete_rating_matrix[self.complete_rating_matrix < min_rating] = min_rating
+            #self.complete_rating_matrix[self.complete_rating_matrix > max_rating] = max_rating # rescale predicted ratings
+            #self.complete_rating_matrix[self.complete_rating_matrix < min_rating] = min_rating
             err_matrix = self.ratings.rating_matrix - self.complete_rating_matrix
             err_matrix[observe_matrix] = 0
             self.loss_val = np.sum(np.power(err_matrix, 2)) \

@@ -35,7 +35,7 @@ def get_rating_matrix_from_csv(csv_file_path):
 class Ratings:
     # initialize the rating matrix and relevant properties
     def __init__(self, rating_data, missing_rating_default=0.0):
-        self.ratings = rating_data # data frame containing (userId, itemId, rating, timestamp)
+        self.ratings_df = rating_data # data frame containing (userId, itemId, rating, timestamp)
         self.users_indices = None  # dictionary of {userId: userIndex}
         self.items_indices = None  # dictionary of {itemId: itemIndex}
         self.user_ids = None    # dictionary of {userIndex: userId}
@@ -49,10 +49,10 @@ class Ratings:
 
     # helper function for initialization. Convert the rating data frame to rating and timestamp matrices
     def _convert_to_matrix(self):
-        all_user_id  = self.ratings['userId'].values
+        all_user_id  = self.ratings_df['userId'].values
         users = list(set(all_user_id))
         users.sort()
-        all_item_id = self.ratings['itemId'].values
+        all_item_id = self.ratings_df['itemId'].values
         items = list(set(all_item_id))
         items.sort()
         self.users_indices = dict()
@@ -73,7 +73,7 @@ class Ratings:
         timestamp_values = [[0 for _ in range(self.num_of_items)]
                          for _ in range(self.num_of_users)]
         self.timestamp_matrix = np.matrix(timestamp_values)
-        for _, row in self.ratings.iterrows():
+        for _, row in self.ratings_df.iterrows():
             userId = row['userId']
             itemId = row['itemId']
             rating = row['rating']
@@ -82,7 +82,6 @@ class Ratings:
             itemIndex = self.items_indices[itemId]
             self.rating_matrix[userIndex, itemIndex] = rating
             self.timestamp_matrix[userIndex, itemIndex] = timestamp
-        self.ratings = None
 
     # check if given userId is within the rating data set
     def check_user(self, userId):

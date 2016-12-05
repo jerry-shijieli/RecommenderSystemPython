@@ -6,6 +6,7 @@ sys.path.append("../util/")
 import dataloader as dl
 import UserNearestNeighbor as unn_model
 import MultiNeuralNetwork as mnn_model
+import MatrixFactorization as mf_model
 
 
 dl.test()
@@ -44,9 +45,16 @@ testset_target = testset['rating'].values
 # rmse = unn.score(testset_feature, testset_target)
 # print rmse
 
-mnn = mnn_model.MultiNeuralNetwork(threshold_rating_num=2000) # set the least number of rated values
-mnn.fit(trainset_feature, trainset_target)
-predictions = mnn.predict(testset_feature)
+# mnn = mnn_model.MultiNeuralNetwork(threshold_rating_num=2000) # set the least number of rated values
+# mnn.fit(trainset_feature, trainset_target)
+# predictions = mnn.predict(testset_feature)
+# print zip(predictions, testset_target)
+# rmse = mnn.score(testset_feature, testset_target)
+# print rmse
+
+mf = mf_model.MatrixFactorization(dim_of_factor=30, max_iter=100)
+mf.fit(trainset_feature, trainset_target)
+predictions = mf.predict(testset_feature)
 print zip(predictions, testset_target)
-rmse = mnn.score(testset_feature, testset_target)
+rmse = mf.score(testset_feature, testset_target)
 print rmse

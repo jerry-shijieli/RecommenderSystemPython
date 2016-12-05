@@ -16,13 +16,37 @@ class MatrixFactorization:
         self.user_factor_matrix = None # matrix of user factors
         self.item_factor_matrix = None # matrix of item factors
         self.complete_rating_matrix = None # final rating matrix with missing rating filled by the factor matrix production
+        self.loss_val = np.inf # value of loss function for each iteration
 
     # training process: fit the user factor matrix and item factor matrix using least square optimization
     def fit(self, trainset_feature, trainset_target):
         trainset_df = pd.DataFrame(trainset_feature, columns=['userId', 'itemId', 'timestamp'])
         trainset_df['rating'] = pd.Series(trainset_target)
         self.ratings = dl.Ratings(trainset_df) # load rating data into user-item rating matrix
-        self.user_factor_matrix =
+        self.user_factor_matrix = np.matrix(np.random.rand(self.ratings.num_of_users, self.dim_of_factor))
+        self.item_factor_matrix = np.matrix(np.random.rand(self.ratings.num_of_items, self.dim_of_factor))
+        observe_matrix = (self.ratings.rating_matrix == 0) # initialize and select unrated values to set zero
+        count_iter = 0 # iteration counter
+        self.complete_rating_matrix = self.user_factor_matrix * self.item_factor_matrix.transpose()
+        err_matrix = self.ratings.rating_matrix - self.complete_rating_matrix
+        err_matrix[observe_matrix] = 0
+        self.loss_val = np.sum(np.power(err_matrix, 2)) \
+                        + self.regularization / 2 * np.sum(np.power(self.user_factor_matrix, 2)) \
+                        + self.regularization / 2 * np.sum(np.power(self.item_factor_matrix, 2))
+        while (count_iter<=self.max_iter and self.loss_val>self.tolerance):
+            count_iter += 1
+            user_factor_matrix_update = self.learning_rate * (err_matrix * self.item_factor_matrix
+                                                              - self.regularization * self.user_factor_matrix)
+            item_factor_matrix_update = self.learning_rate * (err_matrix.transpose() * self.user_factor_matrix
+                                                              - self.regularization * self.item_factor_matrix)
+            self.user_factor_matrix += user_factor_matrix_update
+            self.item_factor_matrix += item_factor_matrix_update
+            self.complete_rating_matrix = self.user_factor_matrix * self.item_factor_matrix.transpose()
+            err_matrix = self.ratings.rating_matrix - self.complete_rating_matrix
+            err_matrix[observe_matrix] = 0
+            self.loss_val = np.sum(np.power(err_matrix, 2)) \
+                            + self.regularization / 2 * np.sum(np.power(self.user_factor_matrix, 2)) \
+                            + self.regularization / 2 * np.sum(np.power(self.item_factor_matrix, 2))
 
     # given test feature, predict the rating
     def predict(self, testset_feature):

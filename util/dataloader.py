@@ -46,6 +46,8 @@ class Ratings:
         self.timestamp_matrix =  None   # matrix of user-item rating timestamp
         self.missing_rating_default_value = missing_rating_default # default value for missing rating
         self._convert_to_matrix()
+        self.max_rating = np.max(ratings_df['rating'])
+        self.min_rating = np.min(ratings_df['rating'])
 
     # helper function for initialization. Convert the rating data frame to rating and timestamp matrices
     def _convert_to_matrix(self):

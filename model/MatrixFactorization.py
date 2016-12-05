@@ -20,14 +20,22 @@ class MatrixFactorization:
 
     # training process: fit the user factor matrix and item factor matrix using least square optimization
     def fit(self, trainset_feature, trainset_target):
+        self.fit_by_raw_matrix_factorization(self, trainset_feature, trainset_target)
+
+    # apply matrix factorization to the raw rating matrix
+    def fit_by_raw_matrix_factorization(self, trainset_feature, trainset_target):
         trainset_df = pd.DataFrame(trainset_feature, columns=['userId', 'itemId', 'timestamp'])
         trainset_df['rating'] = pd.Series(trainset_target)
         self.ratings = dl.Ratings(trainset_df) # load rating data into user-item rating matrix
         self.user_factor_matrix = np.matrix(np.random.rand(self.ratings.num_of_users, self.dim_of_factor))
         self.item_factor_matrix = np.matrix(np.random.rand(self.ratings.num_of_items, self.dim_of_factor))
+        max_rating = self.ratings.max_rating
+        min_rating = self.ratings.min_rating
         observe_matrix = (self.ratings.rating_matrix == 0) # initialize and select unrated values to set zero
         count_iter = 0 # iteration counter
         self.complete_rating_matrix = self.user_factor_matrix * self.item_factor_matrix.transpose()
+        self.complete_rating_matrix[self.complete_rating_matrix > max_rating] = max_rating # rescale predicted ratings by top and bottom limits
+        self.complete_rating_matrix[self.complete_rating_matrix < min_rating] = min_rating
         err_matrix = self.ratings.rating_matrix - self.complete_rating_matrix
         err_matrix[observe_matrix] = 0
         self.loss_val = np.sum(np.power(err_matrix, 2)) \
@@ -42,6 +50,8 @@ class MatrixFactorization:
             self.user_factor_matrix += user_factor_matrix_update
             self.item_factor_matrix += item_factor_matrix_update
             self.complete_rating_matrix = self.user_factor_matrix * self.item_factor_matrix.transpose()
+            self.complete_rating_matrix[self.complete_rating_matrix > max_rating] = max_rating # rescale predicted ratings
+            self.complete_rating_matrix[self.complete_rating_matrix < min_rating] = min_rating
             err_matrix = self.ratings.rating_matrix - self.complete_rating_matrix
             err_matrix[observe_matrix] = 0
             self.loss_val = np.sum(np.power(err_matrix, 2)) \

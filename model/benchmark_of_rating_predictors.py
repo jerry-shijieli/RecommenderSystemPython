@@ -5,6 +5,7 @@ from sklearn.model_selection import KFold
 sys.path.append("../util/")
 import dataloader as dl
 import UserNearestNeighbor as unn_model
+import MatrixFactorization as mf_model
 
 
 datafilepath = '../data/ml-latest-small/ratings_x.csv'
@@ -19,7 +20,8 @@ trainset_target = trainset['rating'].values
 testset_feature = testset[['userId','itemId', 'timestamp']].values
 testset_target = testset['rating'].values
 
-all_models = {'UserNearestNeighbor': unn_model.UserNearestNeighbor(topk=10, sim_method='Pearson'),
+all_models = {'UserNearestNeighbor': unn_model.UserNearestNeighbor(topk=30, sim_method='Pearson'),
+              'MatrixFactorization': mf_model.MatrixFactorization(dim_of_factor=10, max_iter=100)
               }
 
 for model_name in all_models.keys():

@@ -73,6 +73,11 @@ class UserNearestNeighbor:
         predictions = self.predict(testset_feature)
         return np.sqrt(mean_squared_error(testset_target, predictions))
 
+    # display the setting of the model
+    def display_model_setting(self):
+        print "Model Setting:"
+        print "\tnumber of max neighbors: %d" % self.topk
+        print "\tsimilarity metrics: %s" % self.sim_method
 
 # main function to test module
 def main():

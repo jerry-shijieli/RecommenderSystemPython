@@ -20,8 +20,8 @@ trainset_target = trainset['rating'].values
 testset_feature = testset[['userId','itemId', 'timestamp']].values
 testset_target = testset['rating'].values
 
-all_models = {'UserNearestNeighbor': unn_model.UserNearestNeighbor(topk=30, sim_method='Pearson'),
-              'MatrixFactorization': mf_model.MatrixFactorization(dim_of_factor=10, max_iter=100)
+all_models = {'UserNearestNeighbor': unn_model.UserNearestNeighbor(topk=80, sim_method='Pearson'),
+              'MatrixFactorization': mf_model.MatrixFactorization(dim_of_factor=40, max_iter=100)
               }
 
 for model_name in all_models.keys():
@@ -29,6 +29,7 @@ for model_name in all_models.keys():
     model = all_models[model_name]
     kf = KFold(n_splits=5)
     scores = list()
+    model.display_model_setting()
     for train_index, valid_index in kf.split(trainset_feature):
         print("New validation start...")
         X_train, X_valid = trainset_feature[train_index], trainset_feature[train_index]

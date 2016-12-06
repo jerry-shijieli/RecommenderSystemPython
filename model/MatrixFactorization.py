@@ -85,6 +85,15 @@ class MatrixFactorization:
         predictions = self.predict(testset_feature)
         return np.sqrt(mean_squared_error(testset_target, predictions))
 
+    # display the setting of the model
+    def display_model_setting(self):
+        print "Model Setting:"
+        print "\tnumber of factors: %d" % self.dim_of_factor
+        print "\tlearning rate: %f" % self.learning_rate
+        print "\tmax number of iterations: %d" % self.max_iter
+        print "\tconvergence tolerance: %f" % self.tolerance
+        print "\tregularization factor: %f" % self.regularization
+
 # main function to test module
 def main():
     #datafilepath = '../data/amazon_review/ratings_x.csv'
@@ -101,7 +110,8 @@ def main():
     testset_feature = testset[['userId', 'itemId', 'timestamp']].values
     testset_target = testset['rating'].values
 
-    mf = MatrixFactorization(dim_of_factor=10, max_iter=30)
+    mf = MatrixFactorization(dim_of_factor=15, max_iter=100)
+    mf.display_model_setting()
     mf.fit(trainset_feature, trainset_target)
     predictions = mf.predict(testset_feature)
     print "Prediction vs Actual Value"

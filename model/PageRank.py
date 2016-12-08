@@ -137,7 +137,7 @@ def main():
     sorted_ranks = sorted(ranks_of_page.iteritems(), key=operator.itemgetter(1), reverse=True)
     save_filename = data_filename.split('/')[-1].split('.')[0] + ".csv"
     save_results(sorted_ranks, save_filename)
-    pagerank.draw_top_neighbor_graph('126', 50)
+    pagerank.draw_top_neighbor_graph('12', 50)
     pagerank.draw_graph()
 
 

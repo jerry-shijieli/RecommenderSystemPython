@@ -31,11 +31,15 @@ class MultiNeuralNetwork:
                 userIndex = self.ratings.users_indices[userId]
                 vec = original_rating_matrix[userIndex, :].tolist()[0]
                 bias = self.ratings.get_user_rating_bias(userId)
-                if np.sum(vec != 0) >= self.threshold_rating_num and vec[itemIndex]!=0:
+                #print np.asarray(vec)!=0 # debug
+                if np.sum(np.asarray(vec) != 0) >= self.threshold_rating_num and vec[itemIndex]!=0:
+                    #print "qualified"  # debug
                     vec = map(lambda x: x-bias if x!=0.0 else 0, vec)
+                    #print vec # debug
                     qualified_training_target.append(vec.pop(itemIndex))
                     qualified_training_feature.append(vec)
-            if len(qualified_training_target)>30:
+            if len(qualified_training_target)>3:
+                #print "qualified"  # debug
                 mlpr.fit(qualified_training_feature, qualified_training_target)
                 self.models[itemIndex] = mlpr
         # for itemIndex in xrange(self.ratings.num_of_items):
@@ -70,7 +74,9 @@ class MultiNeuralNetwork:
                     vec.pop(itemIndex)
                     model = self.models[itemIndex]
                     if model is not None:
-                        prediction = model.predict(vec) + self.ratings.get_user_rating_bias(self.ratings.user_ids[userIndex])
+                        #print vec # debug
+                        prediction = model.predict([vec]) + self.ratings.get_user_rating_bias(self.ratings.user_ids[userIndex])
+                        prediction = prediction[0]
                     else:
                         prediction = self.ratings.get_item_rating_bias(self.ratings.item_ids[itemIndex])
                 results.append(prediction)
@@ -87,6 +93,11 @@ class MultiNeuralNetwork:
         predictions = self.predict(testset_feature)
         return np.sqrt(mean_squared_error(testset_target, predictions))
 
+    # display the setting of the model
+    def display_model_setting(self):
+        print "Model Setting:"
+        print "\tthreshold number of observed ratings: %d" % self.threshold_rating_num
+
 # main function to test module
 def main():
     datafilepath = '../data/ml-latest-small/ratings_dp.csv'
@@ -102,7 +113,7 @@ def main():
     testset_feature = testset[['userId', 'itemId', 'timestamp']].values
     testset_target = testset['rating'].values
 
-    mnn = MultiNeuralNetwork(2)
+    mnn = MultiNeuralNetwork(10)
     mnn.fit(trainset_feature, trainset_target)
     predictions = mnn.predict(testset_feature)
     print "Prediction vs Actual Value"

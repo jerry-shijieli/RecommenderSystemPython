@@ -6,9 +6,11 @@ sys.path.append("../util/")
 import dataloader as dl
 import UserNearestNeighbor as unn_model
 import MatrixFactorization as mf_model
+import MultiNeuralNetwork as mnn_model
+from sklearn.metrics import mean_squared_error
 
-
-datafilepath = '../data/ml-latest-small/ratings_x.csv'
+datafilepath = '../data/ml-latest-small/ratings_dp.csv'
+# datafilepath = '../data/ml-latest-small/ratings_x.csv'
 dataset = dl.get_rating_table_from_csv(datafilepath)
 
 test_split_ratio = 0.1
@@ -24,6 +26,9 @@ all_models = {'UserNearestNeighbor': unn_model.UserNearestNeighbor(topk=80, sim_
               'MatrixFactorization': mf_model.MatrixFactorization(dim_of_factor=40, max_iter=100)
               }
 
+# all_models = {'MultiNeuralNetwork': mnn_model.MultiNeuralNetwork(8),
+#               }
+
 for model_name in all_models.keys():
     print("Test new model "+model_name+":")
     model = all_models[model_name]
@@ -35,7 +40,10 @@ for model_name in all_models.keys():
         X_train, X_valid = trainset_feature[train_index], trainset_feature[train_index]
         y_train, y_valid = trainset_target[train_index], trainset_target[train_index]
         model.fit(X_train, y_train)
+        #print (X_valid) # debug
+        #print (y_valid) # debug
         scores.append(model.score(X_valid, y_valid))
+        #scores.append(model.score(testset_feature, testset_target))
     print scores
     print np.mean(scores), np.std(scores)
     rmse = model.score(testset_feature, testset_target)

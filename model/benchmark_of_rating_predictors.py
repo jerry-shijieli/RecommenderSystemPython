@@ -9,8 +9,8 @@ import MatrixFactorization as mf_model
 import MultiNeuralNetwork as mnn_model
 from sklearn.metrics import mean_squared_error
 
-datafilepath = '../data/ml-latest-small/ratings_dp.csv'
-# datafilepath = '../data/ml-latest-small/ratings_x.csv'
+#datafilepath = '../data/ml-latest-small/ratings_dp.csv'
+datafilepath = '../data/ml-latest-small/ratings_x.csv'
 dataset = dl.get_rating_table_from_csv(datafilepath)
 
 test_split_ratio = 0.1
@@ -22,11 +22,11 @@ trainset_target = trainset['rating'].values
 testset_feature = testset[['userId','itemId', 'timestamp']].values
 testset_target = testset['rating'].values
 
-all_models = {'UserNearestNeighbor': unn_model.UserNearestNeighbor(topk=80, sim_method='Pearson'),
-              'MatrixFactorization': mf_model.MatrixFactorization(dim_of_factor=40, max_iter=100)
+all_models = {'UserNearestNeighbor': unn_model.UserNearestNeighbor(topk=10, sim_method='Pearson'),
+              'MatrixFactorization': mf_model.MatrixFactorization(dim_of_factor=10, max_iter=100)
               }
 
-# all_models = {'MultiNeuralNetwork': mnn_model.MultiNeuralNetwork(8),
+# all_models = {'MultiNeuralNetwork': mnn_model.MultiNeuralNetwork(10),
 #               }
 
 for model_name in all_models.keys():
@@ -37,13 +37,10 @@ for model_name in all_models.keys():
     model.display_model_setting()
     for train_index, valid_index in kf.split(trainset_feature):
         print("New validation start...")
-        X_train, X_valid = trainset_feature[train_index], trainset_feature[train_index]
-        y_train, y_valid = trainset_target[train_index], trainset_target[train_index]
+        X_train, X_valid = trainset_feature[train_index], trainset_feature[valid_index]
+        y_train, y_valid = trainset_target[train_index], trainset_target[valid_index]
         model.fit(X_train, y_train)
-        #print (X_valid) # debug
-        #print (y_valid) # debug
         scores.append(model.score(X_valid, y_valid))
-        #scores.append(model.score(testset_feature, testset_target))
     print scores
     print np.mean(scores), np.std(scores)
     rmse = model.score(testset_feature, testset_target)
